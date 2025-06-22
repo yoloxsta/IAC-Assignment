@@ -19,6 +19,9 @@ resource "aws_launch_template" "app_tier_instances" {
     key_name = aws_key_pair.two_tier_key_pair.key_name
     user_data = filebase64("${path.module}/launch_data.sh")
     vpc_security_group_ids = [ aws_security_group.two_tier_app_sg.id ]
+  tags = {
+    Name = "app_tier_instances"
+  }
 }
 
 resource "aws_autoscaling_group" "app_tier_asg" {
