@@ -22,7 +22,7 @@ resource "aws_launch_template" "app_tier_instances" {
 }
 
 resource "aws_autoscaling_group" "app_tier_asg" {
-    availability_zones = [ "us-east-1a", "us-east-1b", "us-east-1c" ]
+    #availability_zones = [ "us-east-1a", "us-east-1b", "us-east-1c" ] #availability_zones + vpc_zone_identifier uae case is Conflict
     desired_capacity = 3
     min_size = 2
     max_size = 3
