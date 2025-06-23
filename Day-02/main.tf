@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "demo_rg" {
 }
 
 resource "azurerm_virtual_network" "demo_vnet" {
-  name                = "vnet_terr_demo"
+  name                = "vnet_terr_demo_soetintaung"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.demo_rg.location
   resource_group_name = azurerm_resource_group.demo_rg.name
@@ -25,7 +25,7 @@ resource "azurerm_subnet" "demo_subnet2" {
 }
 
 resource "azurerm_network_interface" "demo_nic" {
-  name                = "vm_terr_demo"
+  name                = "vm_terr_demo_soetintaung"
   location            = azurerm_resource_group.demo_rg.location
   resource_group_name = azurerm_resource_group.demo_rg.name
 
