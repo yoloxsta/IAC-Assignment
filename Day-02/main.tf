@@ -37,7 +37,7 @@ resource "azurerm_network_interface" "demo_nic" {
 }
 
 resource "azurerm_linux_virtual_machine" "demo_vm" {
-  name                = "vmdemo"
+  name                = "soetintaung"
   resource_group_name = azurerm_resource_group.demo_rg.name
   location            = azurerm_resource_group.demo_rg.location
   size                = "Standard_F2"
