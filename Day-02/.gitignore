@@ -1,0 +1,8 @@
+/.terraform
+.terraform.lock.hcl
+.terraform.tfstate.lock.info
+terraform.tfstate
+terraform.tfstate.backup
+Two-Tier_Key-Pair
+Two_Tier_Key_Pair.pem
+*.pem
