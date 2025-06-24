@@ -1,0 +1,29 @@
+#.gitlab-ci.yaml (main)
+workflow:  
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "pipe_line" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "qa" || $CI_COMMIT_BRANCH == "uat" || $CI_COMMIT_BRANCH == "production"'
+      when: always
+    - when: never
+stages: 
+  - trigger
+
+bps-admin-api-jobs:
+  stage: trigger
+  rules:
+    - changes:
+        - src/project.Api/**/*
+        - src/**/*
+  trigger:
+    include: '.gitlab-ci/services/project-api-ci.yml'
+    strategy: depend
+
+bps-admin-ui-jobs:
+  stage: trigger
+  rules:
+    - changes:
+        - src/project.UI/**/*
+        - src/**/*
+  trigger:
+    include: '.gitlab-ci/services/project-ui-ci.yml'
+    strategy: depend
+
