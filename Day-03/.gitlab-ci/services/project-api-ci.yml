@@ -1,29 +1,25 @@
 include:
-  - local: '.gitlab-ci/cicd-templates/docker-build-template.yml'
-  - local: '.gitlab-ci/cicd-templates/dotnet-package-template.yml'
-  - local: '.gitlab-ci/cicd-templates/deploy-template.yml'
+  - local: '.gitlab-ci/templates/docker-build-template.yml'
+  - local: '.gitlab-ci/templates/deploy-template.yml'
 stages:
   # - package
   - build
   - deploy
 variables:
-  SERVICE_NAME: bps-admin-api
+  SERVICE_NAME: xyz-admin-api
   SERVICE_ROOT_DIR: src
-  SERVICE_DIR: src/Bps.Admin.Api
+  SERVICE_DIR: src/Xyz.Admin.Api
   SERVICE_DOCKERFILE: DockerfileApi
-  NAMESPACE: bps
+  NAMESPACE: xyz
 
-# bps-admin-api-package:
-#   stage: package
-#   extends: .dotnet-package
 
-bps-admin-api-build:
+xyz-admin-api-build:
   stage: build
   # needs: ["bps-admin-api-package"]
   extends: .build-push
 
 bps-admin-api-deploy:
   stage: deploy
-  needs: ["bps-admin-api-build"]
+  needs: ["xyz-admin-api-build"]
   extends: .deploy
 
