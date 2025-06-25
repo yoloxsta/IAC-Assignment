@@ -1,0 +1,76 @@
+.deploy:
+  image: alpine/git
+  variables:
+    MANIFEST_REPO_URL_DEV: git@url.git
+    MANIFEST_REPO_URL_UAT: git@url.git
+    MANIFEST_REPO_URL_QA: git@url.git
+    MANIFEST_REPO_URL_PROD: git@url.git
+
+
+  before_script:
+    - |
+        BRANCH="${CI_COMMIT_BRANCH:-$CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+        if [[ "$BRANCH" == "pipe_line" ]]; then
+          export MANIFEST_REPO_URL=$MANIFEST_REPO_URL_QA;
+        
+        elif [[ "$BRANCH" == "main" ]]; then
+          export MANIFEST_REPO_URL=$MANIFEST_REPO_URL_DEV;
+
+        elif [[ "$BRANCH" == "qa" ]]; then
+          export MANIFEST_REPO_URL=$MANIFEST_REPO_URL_QA;
+
+        elif [[ "$BRANCH" == "uat" ]]; then
+          export MANIFEST_REPO_URL=$MANIFEST_REPO_URL_UAT;
+
+        elif [[ "$BRANCH" == "production" ]]; then
+          export MANIFEST_REPO_URL=$MANIFEST_REPO_URL_PROD;
+
+        else
+          echo "Unknown Branch"; exit 1;
+        fi
+
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-keyscan gitlab.hostname >> ~/.ssh/known_hosts
+
+  rules:
+    - if: $CI_COMMIT_BRANCH == "pipe_line" 
+      when: manual
+    - when: on_success
+  script:
+    - |
+      set -e
+      echo "Starting deployment process for $SERVICE_NAME"
+
+      retry_count=0
+      max_retries=5
+      while [ ${retry_count} -lt ${max_retries} ]; do
+        echo "Attempt $((retry_count + 1)) of ${max_retries}"
+
+        rm -rf manifest-repo
+        git clone "$MANIFEST_REPO_URL" manifest-repo
+        cd manifest-repo || exit 1
+        sed -i -E "s#^( *image: *['\"]?[^:'\"]+):[^:'\"]+(['\"]?)#\1:${CI_COMMIT_SHORT_SHA}\2#" "$NAMESPACE/$SERVICE_NAME.yaml"
+        git config user.email "---"
+        git config user.name "---"
+        git add "$NAMESPACE/$SERVICE_NAME.yml"
+        git commit -m "Updated ${SERVICE_NAME} to version ${CI_COMMIT_SHORT_SHA}"
+        
+        if git pull --rebase origin main && git push origin main; then
+          echo "Push successful!"
+          exit 0
+        else
+          retry_count=$((retry_count+1))
+          echo "Push failed, retrying..."
+          sleep 5
+        fi
+      done
+      
+      echo "Failed after $MAX_RETRIES attempts"
+      exit 1
+
+  tags:
+    - k8s-runner

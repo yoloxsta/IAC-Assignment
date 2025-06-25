@@ -1,0 +1,51 @@
+#.gitlab/cicd-templates/docker-build-template.yml - shared build ci template yml 
+.build-push:
+  image: docker:28.1
+  services: []
+  variables:
+    BUILDKIT_HOST: "tcp://buildkit.gitlab-runner.svc:1234"
+    DOCKER_HOST: "tcp://docker-service.gitlab-runner.svc.cluster.local:2375"
+    REGISTRY_DEV: swr.ap-southeast-3.myhuaweicloud.com/dev_env
+    REGISTRY_QA: swr.ap-southeast-3.myhuaweicloud.com/qa_env
+    REGISTRY_UAT: swr.ap-southeast-3.myhuaweicloud.com/awsuat_env
+    REGISTRY_PROD: swr.ap-southeast-3.myhuaweicloud.com/prod_env
+  before_script:
+    - |
+        BRANCH="${CI_COMMIT_BRANCH:-$CI_MERGE_REQUEST_TARGET_BRANCH_NAME}"
+        if [[ "$BRANCH" == "pipe_line" ]]; then
+          export REGISTRY=$REGISTRY_DEV;
+        
+        elif [[ "$BRANCH" == "main" ]]; then
+          export REGISTRY=$REGISTRY_DEV;
+
+        elif [[ "$BRANCH" == "qa" ]]; then
+          export REGISTRY=$REGISTRY_QA;
+
+        elif [[ "$BRANCH" == "uat" ]]; then
+          export REGISTRY=$REGISTRY_UAT;
+        
+        elif [[ "$BRANCH" == "production" ]]; then
+          export REGISTRY=$REGISTRY_PROD;
+
+        else
+          echo "Unknown Branch"; exit 1;
+        fi
+    - echo "registry=$REGISTRY"
+    - export DOCKER_HOST=$DOCKER_HOST
+
+  script:
+    - docker buildx create --name mybuilder --driver remote $BUILDKIT_HOST --use
+    - docker buildx use mybuilder
+    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin "$REGISTRY"
+    - >
+      docker buildx build
+      --load
+      --tag $REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHORT_SHA
+      --cache-from type=registry,ref=$REGISTRY/$SERVICE_NAME:buildcache
+      --cache-to type=registry,ref=$REGISTRY/$SERVICE_NAME:buildcache,mode=max
+      --file $SERVICE_DOCKERFILE
+      .
+    - docker push $REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHORT_SHA
+
+  tags:
+    - k8s-runner
