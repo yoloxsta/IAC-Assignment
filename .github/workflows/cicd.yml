@@ -3,6 +3,8 @@ name: Deploy day-04 app to AWS ECS
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'day-04/**'
 
 env:
   AWS_REGION: us-west-2
