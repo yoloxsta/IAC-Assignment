@@ -6,46 +6,41 @@ on:
     paths:
       - 'day-04/**'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
     paths:
       - 'day-04/**'
 
 env:
   AWS_REGION: us-west-2
-  ECR_REPOSITORY: hello-world-app
-  IMAGE_TAG: latest
-  ECS_CLUSTER: hello-world-cluster
-  ECS_SERVICE: hello-world-service
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout source code
-      uses: actions/checkout@v4
-
+    - uses: actions/checkout@v2
+    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
-
+    
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build and Push Docker image
+    
+    - name: Build and push Docker image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: hello-world-app
+        IMAGE_TAG: latest
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./day-04
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-    - name: Force ECS New Deployment
+    
+    - name: Force new deployment
       run: |
-        aws ecs update-service \
-          --cluster $ECS_CLUSTER \
-          --service $ECS_SERVICE \
-          --force-new-deployment
+        aws ecs update-service --cluster hello-world-cluster --service hello-world-service --force-new-deployment
