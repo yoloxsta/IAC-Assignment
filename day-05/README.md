@@ -1,6 +1,6 @@
 ### Day-05
 
-#### Gitlab-runner (docker ececute)
+#### Gitlab-runner (docker execute)
 
 ```
 concurrent = 1
