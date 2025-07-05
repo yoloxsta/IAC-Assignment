@@ -57,3 +57,5 @@ sudo usermod -aG docker gitlab-runner
 sudo systemctl restart gitlab-runner
 
 ```
+
+- https://youtu.be/9kGC2CrFJME?si=TURZP_yhaj-QJQIz
