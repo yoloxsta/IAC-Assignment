@@ -59,3 +59,9 @@ sudo systemctl restart gitlab-runner
 ```
 
 - https://youtu.be/9kGC2CrFJME?si=TURZP_yhaj-QJQIz
+
+### curl pod 
+
+```
+ kubectl run curlpod -n music-uat --rm -it --image=curlimages/curl --restart=Never -- sh
+```
