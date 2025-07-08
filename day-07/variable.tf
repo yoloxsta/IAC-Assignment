@@ -7,7 +7,7 @@ variable "private_subnets" {
   type = list(any)
   //fake
   default = [
-      "subnet-05076a8ea9e3d76c4",
+      "subnet-0c4236993bfd9c343",
       "subnet-066399e659957deb8"
   ]
 }

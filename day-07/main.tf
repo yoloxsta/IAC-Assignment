@@ -13,28 +13,26 @@ provider "aws" {
   profile = "yoloxsta"
 }
 
-# Load balancer security group. CIDR and port ingress can be changed as required.
 resource "aws_security_group" "lb_security_group" {
   description = "LoadBalancer Security Group"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
+
   ingress {
-    description      = "Allow from anyone on port 80"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "Allow from anyone on port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Allow from anyone on port 80 IPv6"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    ipv6_cidr_blocks = ["::/0"]
   }
 }
-resource "aws_security_group_rule" "sg_ingress_rule_all_to_lb" {
-  type	= "ingress"
-  description = "Allow from anyone on port 80"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks  = ["::/0"]
-  security_group_id = aws_security_group.lb_security_group.id
-}
+
 
 # Load balancer security group egress rule to ECS cluster security group.
 resource "aws_security_group_rule" "sg_egress_rule_lb_to_ecs_cluster" {
