@@ -22,5 +22,9 @@ root@ip:/etc/ssh# grep -Ri passwordauthentication /etc/ssh/sshd_config*
 /etc/ssh/sshd_config.d/movieuat.conf:    PasswordAuthentication yes
 root@ip:/etc/ssh#
 
+---
+
+sudo visudo
+soetintaung ALL=(ALL) NOPASSWD:ALL
 
 ```
