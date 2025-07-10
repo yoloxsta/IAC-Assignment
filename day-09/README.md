@@ -3,6 +3,15 @@
 ```
 - sudo adduser soetintaung
 - sudo passwd soetintaung
+- sudo vi /etc/ssh/sshd_config
+
+{PasswordAuthentication yes}
+
+- sudo nano /etc/ssh/sshd_config.d/99-override-password-auth.conf
+
+{PasswordAuthentication yes}
+
+- sudo systemctl restart ssh
 
 
 root@ip:/etc/ssh# grep -Ri passwordauthentication /etc/ssh/sshd_config*
