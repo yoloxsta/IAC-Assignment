@@ -17,3 +17,15 @@ INSERT INTO users (name, email) VALUES ('Soe Tint Aung', 'soe@example.com');
 
 Then, http://localhost:8080, refresh
 ```
+
+---
+
+```
+| Config File        | Purpose                                                         |
+| ------------------ | --------------------------------------------------------------- |
+| `nginx.conf`       | Configures web server behavior                                  |
+| `fpm-pool.conf`    | Configures PHP-FPM process pool                                 |
+| `php.ini`          | Configures PHP runtime settings                                 |
+| `supervisord.conf` | Manages and runs nginx & php-fpm processes inside the container |
+
+```
