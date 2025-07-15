@@ -1,19 +1,48 @@
-version: "3"
+version: "2"
+
 services:
   nginx:
-    image: nginx:latest
+    build: ./nginx/
+    container_name: nginx-container
     ports:
       - "8080:80"
-    volumes:
-      - ./www/html:/var/www/html
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
+    links:
       - php
+    volumes_from:
+      - app-data
 
   php:
-    image: php:7.0-fpm
+    build: ./php/
     container_name: php-container
     expose:
       - "9000"
+    links:
+      - mysql
+    volumes_from:
+      - app-data
+
+  app-data:
+    image: php:7.0-fpm
+    container_name: app-data-container
+    command: "true"
     volumes:
-      - ./www/html:/var/www/html
+      - ./www/html/:/var/www/html/
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-container
+    volumes_from:
+      - mysql-data
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: password
+
+  mysql-data:
+    image: mysql:5.7
+    container_name: mysql-data-container
+    command: "true"
+    volumes:
+      - /var/lib/mysql
+
