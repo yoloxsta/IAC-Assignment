@@ -3,6 +3,16 @@
 #### Gitlab-runner (docker execute)
 
 ```
+docker --version
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo usermod -aG docker gitlab-runner
+sudo systemctl restart gitlab-runner
+
+
+---
 concurrent = 1
 check_interval = 0
 connection_max_age = "15m0s"
