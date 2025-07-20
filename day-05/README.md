@@ -8,7 +8,7 @@ sudo apt update
 sudo apt install -y docker.io
 sudo systemctl start docker
 sudo systemctl enable docker
-sudo usermod -aG docker gitlab-runner
+sudo usermod -aG docker gitlab-runner  (/etc/gitlab-runner/config.toml)
 sudo systemctl restart gitlab-runner
 
 
