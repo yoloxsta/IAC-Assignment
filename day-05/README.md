@@ -13,6 +13,9 @@ sudo systemctl restart gitlab-runner
 
 sudo cp /home/ubuntu/.gitlab-runner/config.toml /etc/gitlab-runner/config.toml
 sudo chown gitlab-runner:gitlab-runner /etc/gitlab-runner/config.toml
+sudo systemctl restart gitlab-runner
+sudo gitlab-runner list
+
 
 
 ---
