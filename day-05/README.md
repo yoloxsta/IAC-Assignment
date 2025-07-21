@@ -81,3 +81,11 @@ sudo systemctl restart gitlab-runner
 ```
  kubectl run curlpod -n music-uat --rm -it --image=curlimages/curl --restart=Never -- sh
 ```
+
+## Checking installed list
+
+```
+dpkg -l
+apt list --installed
+
+```
