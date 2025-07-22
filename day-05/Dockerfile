@@ -1,4 +1,4 @@
-FROM docker:latest
+FROM docker:latest 
 
 # Install system packages
 RUN apk add --no-cache \
@@ -9,7 +9,7 @@ RUN apk add --no-cache \
     python3 \
     py3-pip
 
-# Install AWS CLI (allowing system install with PEP 668)
+# Install AWS CLI 
 RUN pip3 install awscli --no-cache-dir --break-system-packages
 
 # SSH config (disable host key check for Git/SSH use in CI)
