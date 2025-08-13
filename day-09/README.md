@@ -13,7 +13,6 @@
 
 - sudo systemctl restart ssh
 
-
 root@ip:/etc/ssh# grep -Ri passwordauthentication /etc/ssh/sshd_config*
 /etc/ssh/sshd_config:PasswordAuthentication yes
 /etc/ssh/sshd_config:# PasswordAuthentication.  Depending on your PAM configuration,
