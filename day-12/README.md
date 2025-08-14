@@ -108,3 +108,85 @@ chmod +x pg_migration_lab.sh
 ./pg_migration_lab.sh
 
 ```
+
+## Db migration between 2 containers
+
+```
+docker-compose.yml
+
+version: "3.9"
+services:
+  pgsrc:
+    image: postgres:15
+    container_name: pgsrc
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    networks:
+      - pgnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser"]
+      interval: 5s
+      retries: 5
+
+  pgtgt:
+    image: postgres:15
+    container_name: pgtgt
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    networks:
+      - pgnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser"]
+      interval: 5s
+      retries: 5
+
+networks:
+  pgnet:
+    driver: bridge
+
+---
+
+migrate.sh >>
+
+#!/bin/bash
+set -e
+
+echo "🚀 Starting containers..."
+docker compose up -d
+
+echo "⏳ Waiting for PostgreSQL containers to be ready..."
+sleep 10
+
+echo "📦 Creating table and inserting data into Source DB..."
+docker exec -i pgsrc psql -U myuser -d mydb <<EOF
+CREATE TABLE IF NOT EXISTS employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50),
+    department VARCHAR(50),
+    salary INT
+);
+INSERT INTO employees (name, department, salary) VALUES
+('Alice', 'IT', 5000),
+('Bob', 'HR', 4000),
+('Charlie', 'Finance', 4500);
+EOF
+
+echo "✅ Source DB data:"
+docker exec pgsrc psql -U myuser -d mydb -c "SELECT * FROM employees;"
+
+echo "💾 Backing up data from Source DB..."
+docker exec pgsrc pg_dump -U myuser -F c mydb > mydb_backup.dump
+
+echo "📤 Restoring backup into Target DB..."
+cat mydb_backup.dump | docker exec -i pgtgt pg_restore -U myuser -d mydb
+
+echo "🔍 Target DB data after migration:"
+docker exec pgtgt psql -U myuser -d mydb -c "SELECT * FROM employees;"
+
+echo "🎉 Migration complete!"
+
+```
