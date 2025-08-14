@@ -207,3 +207,9 @@ docker exec pgsrc pg_dump -U myuser -F c mydb > $BACKUP_DIR/mydb_$DATE.dump
 find $BACKUP_DIR -type f -mtime +30 -delete
 
 ```
+## Tips
+```
+docker exec -i target-container-name psql -U username -d db-name -c "DROP DATABASE db-name;"
+docker exec -i target-container psql -U username -d db-name -c "CREATE DATABASE db-name;"
+cat mydb_backup.dump | docker exec -i target-container-name pg_restore -U username -d db-name
+```
