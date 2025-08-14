@@ -190,3 +190,20 @@ docker exec pgtgt psql -U myuser -d mydb -c "SELECT * FROM employees;"
 echo "🎉 Migration complete!"
 
 ```
+
+## cron
+
+```
+/opt/pg_backup.sh
+
+#!/bin/bash
+DATE=$(date +%F)
+BACKUP_DIR="/opt/pg_backups"
+mkdir -p $BACKUP_DIR
+
+docker exec pgsrc pg_dump -U myuser -F c mydb > $BACKUP_DIR/mydb_$DATE.dump
+
+# Optional: remove backups older than 30 days
+find $BACKUP_DIR -type f -mtime +30 -delete
+
+```
